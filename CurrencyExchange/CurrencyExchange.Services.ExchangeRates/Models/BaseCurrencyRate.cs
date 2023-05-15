@@ -9,7 +9,7 @@ namespace CurrencyExchange.Services.ExchangeRates.Models
         [JsonPropertyName("date")]
         public DateTime RetrievalDate { get; set; }
         [JsonPropertyName("rates")]
-        public Rates Rates { get; set; }
+        public Dictionary<string, Decimal> Rates { get; set; }
         [JsonPropertyName("success")]
         public bool Success { get; set; }
         [JsonPropertyName("timestamp")]

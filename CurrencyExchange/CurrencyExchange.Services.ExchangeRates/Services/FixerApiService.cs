@@ -22,5 +22,12 @@ namespace CurrencyExchange.Services.ExchangeRates.Services
             return await response.ReadContentAs<BaseCurrencyRate>();
         }
 
+        public async Task<SymbolsResponse> GetSymbols()
+        {
+            var apiUri = "/fixer/symbols";
+            var response = await _httpClient.GetAsync($"{apiUri}");
+            return await response.ReadContentAs<SymbolsResponse>();
+        }
+
     }
 }

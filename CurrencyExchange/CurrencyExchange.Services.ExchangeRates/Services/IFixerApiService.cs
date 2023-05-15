@@ -5,5 +5,6 @@ namespace CurrencyExchange.Services.ExchangeRates.Services
     public interface IFixerApiService
     {
         Task<BaseCurrencyRate> GetLatest(string @base, string symbols);
+        Task<SymbolsResponse> GetSymbols();
     }
 }
