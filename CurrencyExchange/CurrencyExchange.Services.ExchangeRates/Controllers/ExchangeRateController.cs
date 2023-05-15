@@ -16,7 +16,7 @@ namespace CurrencyExchange.Services.ExchangeRates.Controllers
         }
 
         [HttpGet("GetLatestCurrencyRates")]
-        public async Task<ActionResult<BaseCurrencyRate>> GetLatest( string @base, string symbol)
+        public async Task<ActionResult<BaseCurrencyRate>> GetLatest(string @base, string symbol)
         {
             var result = await fixerApiService.GetLatest(@base, symbol);
             return Ok(result);
@@ -27,6 +27,26 @@ namespace CurrencyExchange.Services.ExchangeRates.Controllers
         {
             var result = await fixerApiService.GetSymbols();
             return Ok(result);
+        }
+
+        [HttpGet("GetLatestForAll")]
+        public async Task<ActionResult<Dictionary<string, BaseCurrencyRate>>> GetLatestForAll()
+        {
+            var result = await fixerApiService.GetSymbols();
+
+            //log
+            if (result == null)
+                return Ok("GetSymbols endpoint returned null");        
+
+            var symbols = result.Symbols?.Keys;
+
+            //log
+            if (symbols == null || symbols.Count == 0)
+                return Ok("There is no symbols to process");
+
+            var resultForAll = await fixerApiService.GetLatestForAll(symbols);
+
+            return Ok(resultForAll);
         }
     }
 }
