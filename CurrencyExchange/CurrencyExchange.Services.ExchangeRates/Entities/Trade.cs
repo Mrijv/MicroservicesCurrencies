@@ -2,7 +2,7 @@
 
 namespace CurrencyExchange.Services.ExchangeRates.Entities
 {
-    public class Trade
+    public class Trade : AuditableEntity
     {
         public Guid TradeId { get; set; }
         public decimal Result { get; set; }
