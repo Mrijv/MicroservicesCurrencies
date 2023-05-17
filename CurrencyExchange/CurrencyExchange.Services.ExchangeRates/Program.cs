@@ -1,13 +1,10 @@
 using AutoMapper;
 using CurrencyExchange.ExchangeRates.Persistence;
 using CurrencyExchange.Services.ExchangeRates.Caching;
-using CurrencyExchange.Services.ExchangeRates.Entities;
 using CurrencyExchange.Services.ExchangeRates.Repositories;
 using CurrencyExchange.Services.ExchangeRates.Seed;
 using CurrencyExchange.Services.ExchangeRates.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
