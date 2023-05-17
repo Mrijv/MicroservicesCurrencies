@@ -13,14 +13,10 @@ namespace CurrencyExchange.Services.ExchangeRates.Configurations
                 .HasColumnType("money");
 
             builder.Property(o => o.AmountTo)
-                .IsRequired()
                 .HasColumnType("money");
 
             builder.Property(o => o.Rate)
                 .IsRequired()
-                .HasColumnType("money");
-
-            builder.Property(o => o.Result)
                 .HasColumnType("money");
 
             builder.Property(o => o.CurrencyFrom)

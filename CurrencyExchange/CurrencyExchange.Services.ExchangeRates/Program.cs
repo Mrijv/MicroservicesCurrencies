@@ -19,7 +19,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
 builder.Services.AddScoped<ISymbolRepository, SymbolRepository>();
-
+builder.Services.AddScoped<ITradeRepository, TradeRepository>();
+builder.Services.AddScoped<ITradeService, TradeService>();
 builder.Services.AddHttpClient<IFixerApiService, FixerApiService>(c =>
     c.BaseAddress = new Uri(builder.Configuration["ApiConfigs:FixerApi:Uri"]));
 builder.Services.AddDbContext<ExchangeRatesDbContext>(opt

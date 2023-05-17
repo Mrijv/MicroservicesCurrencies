@@ -1,5 +1,9 @@
-﻿using CurrencyExchange.Services.ExchangeRates.Extensions;
+﻿using AutoMapper;
+using CurrencyExchange.Services.ExchangeRates.Entities;
+using CurrencyExchange.Services.ExchangeRates.Extensions;
 using CurrencyExchange.Services.ExchangeRates.Models;
+using CurrencyExchange.Services.ExchangeRates.Repositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace CurrencyExchange.Services.ExchangeRates.Services
@@ -7,10 +11,15 @@ namespace CurrencyExchange.Services.ExchangeRates.Services
     public class FixerApiService : IFixerApiService
     {
         private readonly HttpClient _httpClient;
+        private readonly ICurrencyRateRepository currencyRepository;
+        private readonly IMapper mapper;
 
-        public FixerApiService(HttpClient httpClient)
+        public FixerApiService(HttpClient httpClient, ICurrencyRateRepository currencyRepository,
+            IMapper mapper)
         {
             _httpClient = httpClient;
+            this.currencyRepository = currencyRepository;
+            this.mapper = mapper;
             _httpClient.DefaultRequestHeaders.Add("apikey", "QqTWNjbjznlYwHiIOKOQzuya3I9RjQws");
             _httpClient.Timeout = TimeSpan.FromMinutes(3);
         }
@@ -38,11 +47,11 @@ namespace CurrencyExchange.Services.ExchangeRates.Services
 
                 var apiUri = "/exchangerates_data/latest";
                 var queryString = $"base={symbol}&symbols={Uri.EscapeDataString(symbolsAsParams)}";
-                var response = await _httpClient.GetAsync($"{apiUri}?{queryString}");
                 counter++;
-                
+
                 try
                 {
+                    var response = await _httpClient.GetAsync($"{apiUri}?{queryString}");
                     baseCurrencyRates = await response.ReadContentAs<BaseCurrencyRate>();
                 }
                 catch (Exception e)
@@ -74,6 +83,40 @@ namespace CurrencyExchange.Services.ExchangeRates.Services
                 //log
                 return null;
             }
+        }
+
+        public async Task<decimal> AddRate(string baseCurrency, string currencyTo)
+        {
+            var apiUri = "/exchangerates_data/latest";
+            var queryString = $"base={baseCurrency}&symbols={currencyTo}";
+
+            try
+            {
+                var response = await _httpClient.GetAsync($"{apiUri}?{queryString}");
+                var responseObject = await response.ReadContentAs<BaseCurrencyRate>();
+
+                if (responseObject == null)
+                    return decimal.Zero;
+
+                var addedRate = await AddRateToDb(responseObject);
+
+                if(addedRate == null)
+                    return decimal.Zero;
+
+                return addedRate.Rate;
+            }
+            catch (Exception e)
+            {
+                //log
+            }
+
+            return decimal.Zero;
+        }
+
+        private async Task<CurrencyRate> AddRateToDb(BaseCurrencyRate baseCurrencyRate)
+        {
+            var baseCurrency = mapper.Map<CurrencyRate>(baseCurrencyRate);
+            return await currencyRepository.AddAsync(baseCurrency);
         }
 
     }
