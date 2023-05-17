@@ -32,6 +32,7 @@ namespace CurrencyExchange.Services.ExchangeRates.Services
 
             foreach (var symbol in symbols)
             {
+                //I had to limit the number of calls as Free Api key has its own limitations
                 if (counter == 3)
                     break;
 

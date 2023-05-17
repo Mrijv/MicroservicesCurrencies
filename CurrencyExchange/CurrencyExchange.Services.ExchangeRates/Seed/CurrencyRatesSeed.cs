@@ -7,14 +7,14 @@ using System.Linq;
 
 namespace CurrencyExchange.Services.ExchangeRates.Seed
 {
-    public class RetrieveCurrenciesRatesFirstTime
+    public class CurrencyRatesSeed
     {
         private readonly IFixerApiService fixerService;
         private readonly IAsyncRepository<CurrencyRate> currencyRateRepository;
         private readonly IAsyncRepository<Symbol> symbolRepository;
         private readonly IMapper mapper;
 
-        public RetrieveCurrenciesRatesFirstTime(IFixerApiService fixerService, IAsyncRepository<CurrencyRate> currencyRateRepository,
+        public CurrencyRatesSeed(IFixerApiService fixerService, IAsyncRepository<CurrencyRate> currencyRateRepository,
             IAsyncRepository<Symbol> symbolRepository, IMapper mapper)
         {
             this.fixerService = fixerService;

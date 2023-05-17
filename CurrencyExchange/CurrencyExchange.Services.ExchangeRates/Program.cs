@@ -1,5 +1,6 @@
 using AutoMapper;
 using CurrencyExchange.ExchangeRates.Persistence;
+using CurrencyExchange.Services.ExchangeRates.Caching;
 using CurrencyExchange.Services.ExchangeRates.Entities;
 using CurrencyExchange.Services.ExchangeRates.Repositories;
 using CurrencyExchange.Services.ExchangeRates.Seed;
@@ -26,7 +27,7 @@ builder.Services.AddHttpClient<IFixerApiService, FixerApiService>(c =>
     c.BaseAddress = new Uri(builder.Configuration["ApiConfigs:FixerApi:Uri"]));
 builder.Services.AddDbContext<ExchangeRatesDbContext>(opt
                => opt.UseSqlServer(builder.Configuration.GetConnectionString("ExchangeRatesConnectionString")));
-
+builder.Services.AddHostedService<PeriodicActions>();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -35,13 +36,13 @@ using (var scope = app.Services.CreateScope())
 
     try
     {
-        var fixerApiService = services.GetRequiredService<IFixerApiService>(); 
+        var fixerApiService = services.GetRequiredService<IFixerApiService>();
         var currencyRepo = services.GetRequiredService<ICurrencyRateRepository>();
         var symbolRepo = services.GetRequiredService<ISymbolRepository>();
         var mapper = services.GetRequiredService<IMapper>();
 
         await SymbolSeed.SeedAsync(fixerApiService, symbolRepo, mapper);
-        var seedCurrenciecService = new RetrieveCurrenciesRatesFirstTime(fixerApiService, currencyRepo, symbolRepo, mapper);
+        var seedCurrenciecService = new CurrencyRatesSeed(fixerApiService, currencyRepo, symbolRepo, mapper);
 
         await seedCurrenciecService.SeedAsync();
         //Log.Information("Application Starting");
