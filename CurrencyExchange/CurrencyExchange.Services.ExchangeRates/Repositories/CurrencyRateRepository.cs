@@ -44,5 +44,10 @@ namespace CurrencyExchange.Services.ExchangeRates.Repositories
                 dbContext.SaveChanges();
             }
         }
+
+        public async Task<CurrencyRate> ReturnAny()
+        {
+            return await dbContext.Set<CurrencyRate>().FirstOrDefaultAsync();
+        }
     }
 }

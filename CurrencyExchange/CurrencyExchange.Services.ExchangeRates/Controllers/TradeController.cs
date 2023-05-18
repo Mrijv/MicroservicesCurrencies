@@ -9,10 +9,12 @@ namespace CurrencyExchange.Services.ExchangeRates.Controllers
     public class TradeController : Controller
     {
         private readonly ITradeService tradeService;
+        private readonly ILogger<TradeController> logger;
 
-        public TradeController(ITradeService tradeService)
+        public TradeController(ITradeService tradeService, ILogger<TradeController> logger)
         {
             this.tradeService = tradeService;
+            this.logger = logger;
         }
 
         [HttpPost("MakeTrade")]
@@ -27,7 +29,9 @@ namespace CurrencyExchange.Services.ExchangeRates.Controllers
             }
             else
             {
-                return BadRequest("Fixer Api issue");
+                var message = "Couldn't retrieve the currency exchange rate";
+                logger.LogInformation(message);
+                return BadRequest(message);
             }
                 
         }
