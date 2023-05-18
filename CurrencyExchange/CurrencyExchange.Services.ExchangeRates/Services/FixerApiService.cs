@@ -3,8 +3,6 @@ using CurrencyExchange.Services.ExchangeRates.Entities;
 using CurrencyExchange.Services.ExchangeRates.Extensions;
 using CurrencyExchange.Services.ExchangeRates.Models;
 using CurrencyExchange.Services.ExchangeRates.Repositories;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
 namespace CurrencyExchange.Services.ExchangeRates.Services
 {
@@ -13,13 +11,16 @@ namespace CurrencyExchange.Services.ExchangeRates.Services
         private readonly HttpClient _httpClient;
         private readonly ICurrencyRateRepository currencyRepository;
         private readonly IMapper mapper;
+        private readonly ILogger<FixerApiService> logger;
+        private const string errorMessage = "Third-party API returned its server error or its response wasn't mapped correctly";
 
         public FixerApiService(HttpClient httpClient, ICurrencyRateRepository currencyRepository,
-            IMapper mapper)
+            IMapper mapper, ILogger<FixerApiService> logger)
         {
-            _httpClient = httpClient;
             this.currencyRepository = currencyRepository;
             this.mapper = mapper;
+            this.logger = logger;
+            _httpClient = httpClient;            
             _httpClient.DefaultRequestHeaders.Add("apikey", "QqTWNjbjznlYwHiIOKOQzuya3I9RjQws");
             _httpClient.Timeout = TimeSpan.FromMinutes(3);
         }
@@ -28,15 +29,26 @@ namespace CurrencyExchange.Services.ExchangeRates.Services
         {
             var apiUri = "/fixer/latest";
             var queryString = $"base={@base}&symbols={Uri.EscapeDataString(symbols)}";
-            var response = await _httpClient.GetAsync($"{apiUri}?{queryString}");
-            return await response.ReadContentAs<BaseCurrencyRate>();
+            BaseCurrencyRate result = null;
+
+            try
+            {
+                var response = await _httpClient.GetAsync($"{apiUri}?{queryString}");
+                result = await response.ReadContentAs<BaseCurrencyRate>();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(errorMessage, e);
+            }
+
+            return result;
         }
 
         public async Task<Dictionary<string, BaseCurrencyRate>> GetLatestForAll(IEnumerable<string> symbols)
         {
             var symbolsAsParams = String.Join(',', symbols);
             Dictionary<string, BaseCurrencyRate> currenciesRates = new();
-            BaseCurrencyRate baseCurrencyRates = null;
+            BaseCurrencyRate? baseCurrencyRates = null;
             var counter = 0;
 
             foreach (var symbol in symbols)
@@ -56,12 +68,14 @@ namespace CurrencyExchange.Services.ExchangeRates.Services
                 }
                 catch (Exception e)
                 {
-                    //log
-                    //return null;
+                    logger.LogError(errorMessage, e);
                 }
 
                 if (baseCurrencyRates == null)
+                {
+                    logger.LogDebug("Symbol was omited and haven't been added to the database");
                     break;
+                }
 
                 currenciesRates.Add(symbol, baseCurrencyRates);
             }
@@ -71,16 +85,16 @@ namespace CurrencyExchange.Services.ExchangeRates.Services
 
         public async Task<SymbolsResponse> GetSymbols()
         {
-            var apiUri = "/exchangerates_data/symbols";
-            var response = await _httpClient.GetAsync($"{apiUri}");
+            var apiUri = "/exchangerates_data/symbols";            
 
             try
             {
+                var response = await _httpClient.GetAsync($"{apiUri}");
                 return await response.ReadContentAs<SymbolsResponse>();
             }
             catch (Exception e)
             {
-                //log
+                logger.LogError(errorMessage, e);
                 return null;
             }
         }

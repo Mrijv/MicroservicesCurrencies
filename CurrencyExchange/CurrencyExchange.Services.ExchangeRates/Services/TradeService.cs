@@ -31,13 +31,13 @@ namespace CurrencyExchange.Services.ExchangeRates.Services
 
         public async Task<decimal> RetrieveRate(string baseCurrency, string currencyTo)
         {
-            var rate = await currencyRateRepository.RetrieveRate(baseCurrency, currencyTo);
+            var rate = await currencyRateRepository.RetrieveRate(baseCurrency.ToUpper(), currencyTo.ToUpper());
 
             if (!rate.Equals(Decimal.Zero))
                 return rate;
             else
             {
-                return await fixerApiService.AddRate(baseCurrency, currencyTo);                
+                return await fixerApiService.AddRate(baseCurrency.ToUpper(), currencyTo.ToUpper());                
             }
         }
 

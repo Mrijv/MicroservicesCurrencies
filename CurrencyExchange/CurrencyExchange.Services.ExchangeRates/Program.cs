@@ -5,6 +5,7 @@ using CurrencyExchange.Services.ExchangeRates.Repositories;
 using CurrencyExchange.Services.ExchangeRates.Seed;
 using CurrencyExchange.Services.ExchangeRates.Services;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,9 @@ builder.Services.AddHttpClient<IFixerApiService, FixerApiService>(c =>
 builder.Services.AddDbContext<ExchangeRatesDbContext>(opt
                => opt.UseSqlServer(builder.Configuration.GetConnectionString("ExchangeRatesConnectionString")));
 builder.Services.AddHostedService<PeriodicActions>();
+builder.Host
+   .UseSerilog((ctx, lc) => lc
+   .ReadFrom.Configuration(builder.Configuration));
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -38,9 +42,11 @@ using (var scope = app.Services.CreateScope())
         var currencyRepo = services.GetRequiredService<ICurrencyRateRepository>();
         var symbolRepo = services.GetRequiredService<ISymbolRepository>();
         var mapper = services.GetRequiredService<IMapper>();
+        var currencyRateslogger = services.GetRequiredService<ILogger<CurrencyRatesSeed>>();
+        var symbolslogger = services.GetRequiredService<ILogger<SymbolSeed>>();
 
-        await SymbolSeed.SeedAsync(fixerApiService, symbolRepo, mapper);
-        var seedCurrenciecService = new CurrencyRatesSeed(fixerApiService, currencyRepo, symbolRepo, mapper);
+        await SymbolSeed.SeedAsync(fixerApiService, symbolRepo, mapper, symbolslogger);
+        var seedCurrenciecService = new CurrencyRatesSeed(fixerApiService, currencyRepo, symbolRepo, mapper, currencyRateslogger);
 
         await seedCurrenciecService.SeedAsync();
         //Log.Information("Application Starting");

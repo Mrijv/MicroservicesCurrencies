@@ -6,5 +6,6 @@ namespace CurrencyExchange.Services.ExchangeRates.Repositories
     {
         Task<decimal> RetrieveRate(string currencyFrom, string currencyTo);
         Task UpdateRateAsync(CurrencyRate currencyRate);
+        Task<CurrencyRate> ReturnAny();
     }
 }
