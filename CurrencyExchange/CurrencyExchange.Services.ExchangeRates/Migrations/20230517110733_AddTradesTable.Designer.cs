@@ -4,6 +4,7 @@ using CurrencyExchange.ExchangeRates.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CurrencyExchange.Services.ExchangeRates.Migrations
 {
     [DbContext(typeof(ExchangeRatesDbContext))]
-    partial class ExchangeRatesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230517110733_AddTradesTable")]
+    partial class AddTradesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -83,9 +86,6 @@ namespace CurrencyExchange.Services.ExchangeRates.Migrations
                     b.Property<decimal>("AmountTo")
                         .HasColumnType("money");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CurrencyFrom")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -96,10 +96,10 @@ namespace CurrencyExchange.Services.ExchangeRates.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<DateTime?>("LastModifiedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<decimal>("Rate")
+                        .HasColumnType("money");
+
+                    b.Property<decimal>("Result")
                         .HasColumnType("money");
 
                     b.Property<Guid>("UserId")

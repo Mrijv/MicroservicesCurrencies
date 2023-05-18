@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CurrencyExchange.Services.ExchangeRates.Entities;
+using CurrencyExchange.Services.ExchangeRates.Models;
 using CurrencyExchange.Services.ExchangeRates.Repositories;
 using CurrencyExchange.Services.ExchangeRates.Services;
 
@@ -9,10 +10,20 @@ namespace CurrencyExchange.Services.ExchangeRates.Seed
     {
         public static async Task SeedAsync(IFixerApiService fixerService, IAsyncRepository<Symbol> symbolRepository, IMapper mapper)
         {
-            var mySymbols = await symbolRepository.ListAllAsync();
-            var symbolResponse = await fixerService.GetSymbols();
+            IReadOnlyList<Symbol> mySymbols = null;
+            SymbolsResponse symbolResponse = null;
 
-            if (mySymbols.Count == symbolResponse.Symbols.Count)
+            try
+            {
+               mySymbols = await symbolRepository.ListAllAsync();                
+               symbolResponse = await fixerService.GetSymbols();
+            }
+            catch (Exception e)
+            {
+             //log   
+            }
+
+            if(symbolResponse == null || mySymbols == null || mySymbols.Count == symbolResponse.Symbols.Count)
                 return;
 
             if(mySymbols.Count == 0)

@@ -7,5 +7,6 @@ namespace CurrencyExchange.Services.ExchangeRates.Services
         Task<BaseCurrencyRate> GetLatest(string @base, string symbols);
         Task<SymbolsResponse> GetSymbols();
         Task<Dictionary<string, BaseCurrencyRate>> GetLatestForAll(IEnumerable<string> symbols);
+        Task<decimal> AddRate(string baseCurrency, string currencyTo);
     }
 }

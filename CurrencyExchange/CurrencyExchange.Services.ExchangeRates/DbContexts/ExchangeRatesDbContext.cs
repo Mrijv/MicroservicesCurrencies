@@ -15,12 +15,15 @@ namespace CurrencyExchange.ExchangeRates.Persistence
         {
         }
 
+        public DbSet<Trade> Trades { get; set; }
         public DbSet<Symbol> Symbols { get; set; }
         public DbSet<CurrencyRate> CurrencyRates { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ExchangeRatesDbContext).Assembly);
 
             modelBuilder.Entity<CurrencyRate>()
                 .Property(o => o.Rate)

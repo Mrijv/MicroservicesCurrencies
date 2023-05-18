@@ -1,13 +1,10 @@
 using AutoMapper;
 using CurrencyExchange.ExchangeRates.Persistence;
 using CurrencyExchange.Services.ExchangeRates.Caching;
-using CurrencyExchange.Services.ExchangeRates.Entities;
 using CurrencyExchange.Services.ExchangeRates.Repositories;
 using CurrencyExchange.Services.ExchangeRates.Seed;
 using CurrencyExchange.Services.ExchangeRates.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +19,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
 builder.Services.AddScoped<ISymbolRepository, SymbolRepository>();
-
+builder.Services.AddScoped<ITradeRepository, TradeRepository>();
+builder.Services.AddScoped<ITradeService, TradeService>();
 builder.Services.AddHttpClient<IFixerApiService, FixerApiService>(c =>
     c.BaseAddress = new Uri(builder.Configuration["ApiConfigs:FixerApi:Uri"]));
 builder.Services.AddDbContext<ExchangeRatesDbContext>(opt
