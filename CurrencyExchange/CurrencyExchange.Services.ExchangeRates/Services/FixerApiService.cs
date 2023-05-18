@@ -29,8 +29,19 @@ namespace CurrencyExchange.Services.ExchangeRates.Services
         {
             var apiUri = "/fixer/latest";
             var queryString = $"base={@base}&symbols={Uri.EscapeDataString(symbols)}";
-            var response = await _httpClient.GetAsync($"{apiUri}?{queryString}");
-            return await response.ReadContentAs<BaseCurrencyRate>();
+            BaseCurrencyRate result = null;
+
+            try
+            {
+                var response = await _httpClient.GetAsync($"{apiUri}?{queryString}");
+                result = await response.ReadContentAs<BaseCurrencyRate>();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(errorMessage, e);
+            }
+
+            return result;
         }
 
         public async Task<Dictionary<string, BaseCurrencyRate>> GetLatestForAll(IEnumerable<string> symbols)

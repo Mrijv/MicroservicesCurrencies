@@ -20,7 +20,7 @@ namespace CurrencyExchange.Services.ExchangeRates.Controllers
         [HttpGet("GetLatestCurrencyRates")]
         public async Task<ActionResult<BaseCurrencyRate>> GetLatest(string @base, string symbol)
         {
-            var result = await fixerApiService.GetLatest(@base, symbol);
+            var result = await fixerApiService.GetLatest(@base.ToUpper(), symbol.ToUpper());
             return Ok(result);
         }
 

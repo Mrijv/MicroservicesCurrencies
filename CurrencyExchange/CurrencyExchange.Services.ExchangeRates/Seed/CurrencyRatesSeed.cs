@@ -95,6 +95,12 @@ namespace CurrencyExchange.Services.ExchangeRates.Seed
 
         private async Task UpdateBaseRatesWithNewCurrencyToSymbol(List<string> symbolsFromApi, string symbol, BaseCurrencyRate baseCurrencyRate)
         {
+            if (baseCurrencyRate == null)
+            {
+                logger.LogCritical(criticalMessage);
+                return;
+            }
+
             foreach (var key in symbolsFromApi)
             {
                 var currencyRate = await fixerService.GetLatest(key, symbol);
